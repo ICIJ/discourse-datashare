@@ -1,5 +1,23 @@
 {
+  "name": "discourse-datashare",
+  "version": "0.0.0",
+  "repository": "https://github.com/ICIJ/discourse-datashare/",
+  "author": "ICIJ",
+  "license": "MIT",
   "private": true,
+  "scripts": {
+    "lint:assets": "pnpm prettier --check 'assets/**/*.{scss,js,gjs,hbs}'",
+    "lint:prettier": "pnpm lint:assets && pnpm lint:tests",
+    "lint:prettier:fix": "pnpm lint:assets --write",
+    "lint:eslint": "pnpm eslint",
+    "lint:eslint:fix": "pnpm eslint --fix",
+    "lint:ember": "pnpm ember-template-lint --no-error-on-unmatched-pattern assets/javascripts",
+    "lint:ember:fix": "pnpm lint:ember --fix",
+    "lint:stylelint": "pnpm stylelint --allow-empty-input 'assets/**/*.scss'",
+    "lint:stylelint:fix": "pnpm lint:stylelint --fix",
+    "lint": "pnpm lint:prettier && pnpm lint:eslint && pnpm lint:ember && pnpm lint:stylelint",
+    "lint:fix": "pnpm lint:prettier:fix && pnpm lint:eslint:fix && pnpm lint:ember:fix && pnpm lint:stylelint:fix"
+  },
   "devDependencies": {
     "@discourse/lint-configs": "2.32.0",
     "ember-template-lint": "7.9.1",

@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-MyPluginModule::Engine.routes.draw do
-  get "/examples" => "examples#index"
-  # define routes here
+DiscourseDatashare::Engine.routes.draw do
+  get "/topics/:datashare_document_id" => "topics#show", constraints: { format: 'json' }
+  get "/topics/:datashare_document_id/posts_count" => "topics#posts", constraints: { format: 'json' }
 end
-
-Discourse::Application.routes.draw { mount ::MyPluginModule::Engine, at: "my-plugin" }

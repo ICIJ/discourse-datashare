@@ -1,4 +1,9 @@
-TODO_plugin_name:
-  plugin_name_enabled:
-    default: false
+plugins:
+  discourse_datashare_enabled:
+    default: true
     client: true
+  discourse_datashare_create_category_groups:
+    default: "0" # everyone
+    type: group_list
+    allow_any: false
+
