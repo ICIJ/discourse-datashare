@@ -3,9 +3,30 @@ name: Discourse Datashare Plugin
 on:
   push:
 
+permissions:
+  contents: write
+
 jobs:
   ci:
     uses: discourse/.github/.github/workflows/discourse-plugin.yml@v1
     with:
       core_ref: v3.5.2
-      
+
+  bump:
+    needs: ci 
+    if: github.actor != 'github-actions[bot]' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Automated version bump
+        uses: phips28/gh-action-bump-version@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag-prefix: 'v'
+          commit-message: 'build(release): bumps version to {{version}} [skip ci]'
