@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 # name: discourse-datashare
-# about: Use custom fields API to share data between Discourse and Datashare.
-# version: 0.0.0
-# authors: ICIJ
+# about: A plugin to integrate Discourse with Datashare.
+# authors: ICIJ <engineering@icij.org>
 # url: https://github.com/ICIJ/discourse-datashare
+# required_version: 3.4.0
+
 
 enabled_site_setting :discourse_datashare_enabled
 
