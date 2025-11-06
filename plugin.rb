@@ -45,9 +45,9 @@ after_initialize do
   add_to_serializer(
     :basic_category, 
     :created_by_dataconnect,
-    # This condition ensures that the custom field is only included 
-    # for the BasicCategorySerializer and not for children serializers.
-    include_condition: -> { self.instance_of? BasicCategorySerializer }) do
+    # This condition ensures that the custom field is not included 
+    # in the CategoryListSerializer (which already includes custom fields).
+    include_condition: -> { !self.instance_of? CategoryListSerializer  }) do
     !!object.custom_fields[::DiscourseDatashare::CATEGORY_CREATED_BY_FIELD]
   end
 
