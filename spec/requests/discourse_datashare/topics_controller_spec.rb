@@ -45,7 +45,7 @@ describe TopicsController do
       end
 
       describe "user not in group" do
-        it "should return 403" do
+        it "should return 404" do
           category = create_private_category(group, true)
           topic = category.topics[0]
 
@@ -57,7 +57,7 @@ describe TopicsController do
 
           get "/datashare/topics/#{datashare_document_id}.json"
 
-          expect(response.status).to eq(403)
+          expect(response.status).to eq(404)
         end
       end
     end
