@@ -28,12 +28,34 @@ module DiscourseDatashare
     private
 
     def find_topic
-      Topic
-        .includes(:_custom_fields)
-        .includes(:posts)
-        .references(:_custom_fields)
-        .where("topic_custom_fields.value = :entity_id", entity_id: params[:datashare_document_id])
-        .first
+      # Required document ID (custom field name and value)
+      name  = "datashare_document_id"
+      value = params.require(:datashare_document_id)
+      # Optional document index for disambiguation
+      index = params[:datashare_document_index].presence
+
+      # Find all topics that have a custom field
+      scope = Topic
+        .joins(:_custom_fields)
+        .where(topic_custom_fields: { name: name, value: value })
+
+      # For retro compatibility, we support filtering by index on if an index
+      # is given. We want to find:
+      #   * Topics with no 'datashare_document_index' custom field
+      #   * OR topics whose index matches the given value
+      if index
+        scope = scope
+          .joins(
+            "LEFT JOIN topic_custom_fields AS tcf
+              ON tcf.topic_id = topics.id
+              AND tcf.name = 'datashare_document_index'"
+          )
+          .where("tcf.value IS NULL OR tcf.value = ?", index)
+      end
+
+      # Load related posts and custom fields, 
+      # remove duplicates, and finally return the first match
+      scope.includes(:posts, :_custom_fields).distinct.first
     end
 
     def find_topic!
