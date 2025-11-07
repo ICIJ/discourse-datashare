@@ -16,7 +16,8 @@ export default class DatashareDocumentCard extends Component {
       <a
         class="datashare-document-card__link"
         href={{this.safeUrl}}
-        target="_blank" rel="noopener noreferrer"
+        target="_blank"
+        rel="noopener noreferrer"
       >
         {{@title}}
         {{icon
