@@ -67,12 +67,20 @@ after_initialize do
   register_preloaded_category_custom_fields(::DiscourseDatashare::CATEGORY_CREATED_BY_FIELD)
 
   add_to_serializer(
-    :basic_category, 
+    :basic_category,
     :created_by_dataconnect,
-    # This condition ensures that the custom field is not included 
+    # This condition ensures that the custom field is not included
     # in the CategoryListSerializer (which already includes custom fields).
-    include_condition: -> { !self.instance_of? CategoryListSerializer  }) do
-    !!object.custom_fields[::DiscourseDatashare::CATEGORY_CREATED_BY_FIELD]
+    include_condition: -> { !self.instance_of?(CategoryListSerializer) }) do
+    # The root cause is that ActiveModelSerializers's include! method can sometimes access serializer
+    # methods during introspection, even when the include condition would return false. The 
+    # register_preloaded_category_custom_fields should preload the field in most cases, but this
+    # rescue provides asafety net for code paths where preloading doesn't happen.
+    begin
+      !!object.custom_fields[::DiscourseDatashare::CATEGORY_CREATED_BY_FIELD]
+    rescue HasCustomFields::NotPreloadedError
+      false
+    end
   end
 
   add_to_serializer(:topic_view, :datashare_document) do
