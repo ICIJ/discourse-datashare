@@ -6,24 +6,23 @@
 # url: https://github.com/ICIJ/discourse-datashare
 # required_version: 3.4.0
 
-
 enabled_site_setting :datashare_enabled
 
-register_asset 'stylesheets/common/index.scss'
+register_asset "stylesheets/common/index.scss"
 
-module ::DiscourseDatashare  
-  PLUGIN_NAME = 'discourse-datashare'.freeze
+module ::DiscourseDatashare
+  PLUGIN_NAME = "discourse-datashare".freeze
 end
 
-require_relative 'lib/engine'
+require_relative "lib/engine"
 
 after_initialize do
   Discourse::Application.routes.append do
     mount ::DiscourseDatashare::Engine, at: "/datashare"
-    mount ::DiscourseDatashare::Engine, at: "/custom-fields-api", as: 'discourse_datashare_legacy'
+    mount ::DiscourseDatashare::Engine, at: "/custom-fields-api", as: "discourse_datashare_legacy"
     # For backward compatibility we add a endpoint to list a group's categories. The GroupsController is
     # monkey patched to handle this action through the GroupsControllerExtension class.
-    get '/g/:name/categories' => 'groups#categories'
+    get "/g/:name/categories" => "groups#categories"
   end
 
   reloadable_patch do
@@ -59,7 +58,7 @@ after_initialize do
   add_permitted_post_create_param(::DiscourseDatashare::TOPIC_DOCUMENT_TITLE_FIELD, :string)
   add_permitted_post_create_param(::DiscourseDatashare::TOPIC_DOCUMENT_CONTENT_TYPE_FIELD, :string)
   add_permitted_post_create_param(::DiscourseDatashare::TOPIC_DOCUMENT_URL_FIELD, :string)
-  
+
   # Register a custom field to flag categories created by this plugin
   Category.register_custom_field_type(::DiscourseDatashare::CATEGORY_CREATED_BY_FIELD, :boolean)
   # This is necessary to avoid NotPreloadedError when accessing the custom field
@@ -71,9 +70,10 @@ after_initialize do
     :created_by_dataconnect,
     # This condition ensures that the custom field is not included
     # in the CategoryListSerializer (which already includes custom fields).
-    include_condition: -> { !self.instance_of?(CategoryListSerializer) }) do
+    include_condition: -> { !self.instance_of?(CategoryListSerializer) },
+  ) do
     # The root cause is that ActiveModelSerializers's include! method can sometimes access serializer
-    # methods during introspection, even when the include condition would return false. The 
+    # methods during introspection, even when the include condition would return false. The
     # register_preloaded_category_custom_fields should preload the field in most cases, but this
     # rescue provides asafety net for code paths where preloading doesn't happen.
     begin
@@ -84,19 +84,18 @@ after_initialize do
   end
 
   add_to_serializer(:topic_view, :datashare_document) do
-    { 
+    {
       id: object.topic.custom_fields[::DiscourseDatashare::TOPIC_DOCUMENT_ID_FIELD],
       index: object.topic.custom_fields[::DiscourseDatashare::TOPIC_DOCUMENT_INDEX_FIELD],
       routing: object.topic.custom_fields[::DiscourseDatashare::TOPIC_DOCUMENT_ROUTING_FIELD],
       title: object.topic.custom_fields[::DiscourseDatashare::TOPIC_DOCUMENT_TITLE_FIELD],
-      contentType: object.topic.custom_fields[::DiscourseDatashare::TOPIC_DOCUMENT_CONTENT_TYPE_FIELD],
-      url: object.topic.custom_fields[::DiscourseDatashare::TOPIC_DOCUMENT_URL_FIELD]
+      contentType:
+        object.topic.custom_fields[::DiscourseDatashare::TOPIC_DOCUMENT_CONTENT_TYPE_FIELD],
+      url: object.topic.custom_fields[::DiscourseDatashare::TOPIC_DOCUMENT_URL_FIELD],
     }
   end
 
-  add_to_serializer(:post, :full_url) do
-    object.full_url
-  end
+  add_to_serializer(:post, :full_url) { object.full_url }
 
   add_to_serializer(:current_user, :can_create_category) do
     Guardian.new(scope.user).can_create_category?

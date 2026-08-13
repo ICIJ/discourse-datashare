@@ -1,20 +1,20 @@
 # frozen_string_literal: true
-require 'rails_helper'
+require "rails_helper"
 
 describe TopicsController do
-  let(:datashare_document_id) { '123456' }
+  let(:datashare_document_id) { "123456" }
   let(:group) { Fabricate(:icij_group) }
   let(:user) { Fabricate(:user) }
 
-  describe '#show' do
-    describe 'user has rights' do
+  describe "#show" do
+    describe "user has rights" do
       it "should return the topic" do
         group.add(user)
 
         category = create_private_category(group, true)
         topic = category.topics[0]
 
-        topic.custom_fields['datashare_document_id'] = datashare_document_id
+        topic.custom_fields["datashare_document_id"] = datashare_document_id
         topic.user = user
         topic.save
 
@@ -34,7 +34,7 @@ describe TopicsController do
           category = create_private_category(group, true)
           topic = category.topics[0]
 
-          topic.custom_fields['datashare_document_id'] = datashare_document_id
+          topic.custom_fields["datashare_document_id"] = datashare_document_id
           topic.user = user
           topic.save
 
@@ -49,7 +49,7 @@ describe TopicsController do
           category = create_private_category(group, true)
           topic = category.topics[0]
 
-          topic.custom_fields['datashare_document_id'] = datashare_document_id
+          topic.custom_fields["datashare_document_id"] = datashare_document_id
           topic.user = Fabricate(:user)
           topic.save
 
@@ -73,20 +73,17 @@ describe TopicsController do
     end
   end
 
-  describe '#posts' do
-    describe 'topic exists with 15 posts' do
-
+  describe "#posts" do
+    describe "topic exists with 15 posts" do
       before do
         group.add(user)
         category = create_private_category(group, true)
         @topic = category.topics[0]
-        @topic.custom_fields['datashare_document_id'] = datashare_document_id
+        @topic.custom_fields["datashare_document_id"] = datashare_document_id
         @topic.user = user
         @topic.save
 
-        25.times do
-          Fabricate(:post, topic: @topic, user: user)
-        end
+        25.times { Fabricate(:post, topic: @topic, user: user) }
 
         sign_in(user)
       end
@@ -126,15 +123,15 @@ describe TopicsController do
     end
   end
 
-  describe '#posts_count' do
-    describe 'topic exists' do
+  describe "#posts_count" do
+    describe "topic exists" do
       it "should return a post count" do
         group.add(user)
 
         category = create_private_category(group, true)
         topic = category.topics[0]
 
-        topic.custom_fields['datashare_document_id'] = datashare_document_id
+        topic.custom_fields["datashare_document_id"] = datashare_document_id
         topic.user = user
         topic.save
 
@@ -149,7 +146,7 @@ describe TopicsController do
       end
     end
 
-    describe 'topic does not exist' do
+    describe "topic does not exist" do
       it "should return post_count 0" do
         sign_in(Fabricate(:coding_horror))
 

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module DiscourseDatashare::IntegrationHelper
-  
   def create_private_category(group, with_topics = false)
     private_cat = Fabricate(:category)
     private_cat.set_permissions(group.id => 1)
@@ -9,9 +8,7 @@ module DiscourseDatashare::IntegrationHelper
 
     group.update!(categories: [private_cat])
 
-    if with_topics
-      Fabricate(:topic, category: private_cat)
-    end
+    Fabricate(:topic, category: private_cat) if with_topics
 
     private_cat
   end

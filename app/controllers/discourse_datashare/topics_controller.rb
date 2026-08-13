@@ -8,10 +8,18 @@ module DiscourseDatashare
     def show
       topic = find_topic!
 
-      params[:page] = params[:page].to_i rescue 1 if params.key?(:page)
-      params[:limit] = params[:limit].to_i rescue 20 if params.key?(:limit)      
+      params[:page] = begin
+        params[:page].to_i
+      rescue StandardError
+        1
+      end if params.key?(:page)
+      params[:limit] = begin
+        params[:limit].to_i
+      rescue StandardError
+        20
+      end if params.key?(:limit)
       opts = params.slice(:page, :limit, :post_number)
-      
+
       render_serialized(TopicView.new(topic, current_user, opts), TopicViewPostsSerializer)
     end
 
@@ -21,7 +29,7 @@ module DiscourseDatashare
       if topic.present?
         render json: { posts_count: topic.posts_count }
       else
-        render json:  { posts_count: 0 }
+        render json: { posts_count: 0 }
       end
     end
 
@@ -29,27 +37,24 @@ module DiscourseDatashare
 
     def find_topic
       # Required document ID (custom field name and value)
-      name  = "datashare_document_id"
+      name = "datashare_document_id"
       value = params.require(:datashare_document_id)
       # Optional document index for disambiguation
       index = params[:datashare_document_index].presence
 
       # Find all topics that have a custom field
-      scope = Topic
-        .joins(:_custom_fields)
-        .where(topic_custom_fields: { name: name, value: value })
+      scope = Topic.joins(:_custom_fields).where(topic_custom_fields: { name: name, value: value })
       # For retro compatibility, we support filtering by index on if an index
       # is given. We want to find:
       #   * Topics with no 'datashare_document_index' custom field
       #   * OR topics whose index matches the given value
       if index
-        scope = scope
-          .joins(
+        scope =
+          scope.joins(
             "LEFT JOIN topic_custom_fields AS tcf
               ON tcf.topic_id = topics.id
-              AND tcf.name = 'datashare_document_index'"
-          )
-          .where("tcf.value IS NULL OR tcf.value = ?", index)
+              AND tcf.name = 'datashare_document_index'",
+          ).where("tcf.value IS NULL OR tcf.value = ?", index)
       end
 
       # Get the first matching topic, including posts and custom fields

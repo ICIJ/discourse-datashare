@@ -13,7 +13,7 @@ module DiscourseDatashare
       if ActiveModel::Type::Boolean.new.cast(params[:created_by_dataconnect])
         @categories = @categories.created_by_dataconnect
       end
-      render_serialized(@categories, BasicCategorySerializer, root: 'categories')
+      render_serialized(@categories, BasicCategorySerializer, root: "categories")
     end
   end
 end

@@ -7,13 +7,15 @@ module DiscourseDatashare
     extend ActiveSupport::Concern
 
     prepended do
-      scope :created_by_dataconnect, -> {
-        where(id: 
-          CategoryCustomField
-            .where(name: CATEGORY_CREATED_BY_FIELD, value: 'true')
-            .select(:category_id)
-        )
-      }
-    end  
+      scope :created_by_dataconnect,
+            -> do
+              where(
+                id:
+                  CategoryCustomField.where(name: CATEGORY_CREATED_BY_FIELD, value: "true").select(
+                    :category_id,
+                  ),
+              )
+            end
+    end
   end
 end
